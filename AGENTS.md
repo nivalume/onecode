@@ -7,7 +7,7 @@ Skill definitions and supporting resources live in `.skills/`, shared by `.agent
 ## Project Info
 
 - Project name: `onecode`
-- Project type: `workspace` (desktop app built with `gpui-kit`; empty workspace, no crates yet)
+- Project type: `workspace` (desktop app built with `gpui-kit`)
 - MSRV / edition: `1.85` / `2024`
 - Async runtime: GPUI executor (`gpui-kit`); add `tokio` only when concurrent external I/O requires it
 - Domain glossary: none yet (`CONTEXT.md` when added); Architecture Decision Records: none yet (`docs/adr/` when added)
@@ -72,7 +72,7 @@ Both `.agents/skills` and `.claude/skills` symlink to `.skills/`. `improve-codeb
 
 While placeholders (`<...>`) remain in the tables below, ask the user where to place any new crate or module before creating it; do not invent layers on your own.
 
-Layout: `workspace` (empty; crates will live under `crates/`)
+Layout: `workspace`
 
 ```text
 onecode/
@@ -80,7 +80,12 @@ onecode/
 ├── clippy.toml                 # Clippy configuration
 ├── rustfmt.toml                # Rustfmt configuration
 ├── Makefile                    # Common fmt / clippy / test / build targets
-└── crates/                     # Workspace member crates (none yet)
+├── app/
+│   └── onecode/                # onecode (binary entrypoint)
+└── crates/
+    ├── ui/                     # onecode-ui
+    ├── ai/                     # onecode-ai
+    └── core/                   # onecode-core
 ```
 
 ### Layers
