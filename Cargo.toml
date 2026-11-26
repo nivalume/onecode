@@ -18,6 +18,10 @@ publish = false
 # Do not add a separate `gpui` dependency to avoid version mismatches.
 gpui-kit = "0.11"
 
+# Workspace crates
+onecode-core = { path = "crates/core" }
+onecode-ui = { path = "crates/ui" }
+
 # Error handling (thiserror in library crates, anyhow in binary crates)
 thiserror = "2.0"
 anyhow = "1.0"
