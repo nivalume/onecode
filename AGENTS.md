@@ -4,16 +4,18 @@ General Rust project guidelines. Rules in this file take precedence over all ski
 
 Skill definitions and supporting resources live in `.skills/`, shared by `.agents/skills` and `.claude/skills`.
 
-## Project Info (Fill Per Project)
+## Project Info
 
-- Project name: `<name>`
-- Project type: `<binary / library / workspace>`
-- MSRV / edition: `<1.85>` / `<2024>`
-- Async runtime: `<none / tokio>`
-- Domain glossary: `<CONTEXT.md>`; Architecture Decision Records: `<docs/adr/>`
+- Project name: `onecode`
+- Project type: `workspace` (desktop app built with `gpui-kit`; empty workspace, no crates yet)
+- MSRV / edition: `1.85` / `2024`
+- Async runtime: GPUI executor (`gpui-kit`); add `tokio` only when concurrent external I/O requires it
+- Domain glossary: none yet (`CONTEXT.md` when added); Architecture Decision Records: none yet (`docs/adr/` when added)
 - Check commands:
 
   ```bash
+  make check
+  # or individually:
   cargo fmt --all --check
   cargo clippy --workspace --all-targets --all-features -- -D warnings
   cargo test --workspace --all-features
@@ -66,60 +68,38 @@ Both `.agents/skills` and `.claude/skills` symlink to `.skills/`. `improve-codeb
 4. **Run checks and self-review**: run all applicable check commands and verify every item in **Pre-Completion Checklist** (honestly report any unconfigured or unrun checks; never claim they passed). After larger changes, invoke `code-simplifier` and re-run checks.
 5. **Report and wait for review**: per **Vibe Coding Collaboration**, summarize the core implementation in one or two sentences (with an ASCII diagram when complex), then pause for explicit human confirmation before continuing.
 
-## Project Structure (Fill Per Project)
+## Project Structure
 
-While placeholders (`<...>`) remain, ask the user where to place any new crate or module before creating it; do not invent layers on your own.
+While placeholders (`<...>`) remain in the tables below, ask the user where to place any new crate or module before creating it; do not invent layers on your own.
 
-Layout: `<workspace (one crate per layer) | single crate (one module per layer)>`
-
-Workspace:
+Layout: `workspace` (empty; crates will live under `crates/`)
 
 ```text
-<project>/
-├── Cargo.toml                  # [workspace], centralized dependency versions and lints
-└── crates/
-    ├── <project>-<layer>/      # <responsibility>
-    ├── <project>-<layer>/      # <responsibility>
-    └── <project>-<bin>/        # <binary entrypoint>
-```
-
-Single crate:
-
-```text
-<project>/
-├── Cargo.toml
-└── src/
-    ├── main.rs                 # CLI parsing, config loading, dependency wiring, startup only
-    ├── lib.rs                  # module declarations and pub use re-exports only
-    ├── <layer>.rs              # <responsibility>
-    └── <layer>/                # submodules of <layer>
+onecode/
+├── Cargo.toml                  # [workspace], centralized dependency versions, lints, and profiles
+├── clippy.toml                 # Clippy configuration
+├── rustfmt.toml                # Rustfmt configuration
+├── Makefile                    # Common fmt / clippy / test / build targets
+└── crates/                     # Workspace member crates (none yet)
 ```
 
 ### Layers
 
-| Layer | Crate or Module | Responsibility | Allowed Dependencies |
+| Layer | Crate | Responsibility | Allowed Dependencies |
 | --- | --- | --- | --- |
-| `<name>` | `<crates/<project>-<name> or src/<name>.rs>` | `<one sentence>` | `<layer names, or "none">` |
-| `<name>` | `<...>` | `<one sentence>` | `<layer names>` |
-| `<name>` | `<...>` | `<one sentence>` | `<layer names>` |
+| `<name>` | `<crates/<name>>` | `<one sentence>` | `<layer names, or "none">` |
 
 ### Third-Party Dependency Isolation
 
 | Dependency | Allowed Only In |
 | --- | --- |
-| `<e.g. sqlx>` | `<crates/<project>-infra>` |
+| `<e.g. gpui-kit>` | `<UI / shell crates once defined>` |
 
 ### Additional Constraints
 
-- `<e.g. domain must not depend on tokio>`
-
-<!--
-Example (delete once filled in):
-| domain | crates/app-domain | Domain types and business rules, no I/O           | none         |
-| core   | crates/app-core   | Use-case orchestration, storage/service traits    | domain       |
-| infra  | crates/app-infra  | Trait implementations: database, HTTP             | core, domain |
-| cli    | crates/app-cli    | Binary entrypoint: CLI args, config, wiring       | all          |
--->
+- Depend on `gpui-kit` alone for GPUI, `gpui-base`, `gpui-component`, and default assets; never add a separate `gpui` dependency.
+- Member crates must inherit workspace lints (`[lints] workspace = true`) and package metadata (`edition.workspace = true`, `rust-version.workspace = true`, `publish.workspace = true`).
+- For UI integration tests, enable `gpui-kit = { workspace = true, features = ["test-support"] }` under `[dev-dependencies]`.
 
 ### Rules
 
